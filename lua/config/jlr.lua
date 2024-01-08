@@ -7,9 +7,8 @@ local read_file = function(path)
   return content
 end
 
-
 local compile_dataform = function()
-    local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/dataform_compile_cmd.txt"
+    local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_cmd.txt"
     local dataform_compile_cmd = read_file(dataform_compile_cmd_path)
     local output = vim.fn.system(dataform_compile_cmd) -- output is sent to a file using >>
     print("Compiled dataform output to /tmp/temp.sqlx")
