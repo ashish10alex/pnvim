@@ -51,6 +51,7 @@ return {
             },
             -- change current working directory in context of telescope
             cder = {
+              previewer = false,
               dir_command = { 'fd', '--type=d', '.', vim.loop.cwd(), '--hidden', '--follow', '--exclude', '.git' },
             },
           },
