@@ -46,7 +46,6 @@ return {
                 "pyright",
                 "tsserver",
                 "bashls",
-                "terraformls",
           },
           handlers = {
 
