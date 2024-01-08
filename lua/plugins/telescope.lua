@@ -59,7 +59,9 @@ return {
 
         require('telescope').load_extension('fzf')
         require('telescope').load_extension('env')
+
         require('telescope').load_extension('cder')
+        vim.keymap.set('n', '<leader>cd', ':Telescope cder<CR>', {})
 
 		local builtin = require("telescope.builtin")
 
