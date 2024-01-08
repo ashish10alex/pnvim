@@ -7,7 +7,7 @@ return {
         end
     },
     { 'tpope/vim-commentary'},
-    { 'dstein64/vim-startuptime'},
+    -- { 'dstein64/vim-startuptime'},
     { 'inkarkat/vim-ReplaceWithRegister'},
     {  'andres-lowrie/vim-sqlx' },
     { 'yuttie/comfortable-motion.vim',

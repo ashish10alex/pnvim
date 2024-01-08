@@ -33,6 +33,5 @@
   "vim-fugitive": { "branch": "master", "commit": "59659093581aad2afacedc81f009ed6a4bfad275" },
   "vim-gitgutter": { "branch": "main", "commit": "67ef116100b40f9ca128196504a2e0bc0a2753b0" },
   "vim-rhubarb": { "branch": "master", "commit": "ee69335de176d9325267b0fd2597a22901d927b1" },
-  "vim-sqlx": { "branch": "main", "commit": "903d7d85d99e27b0b5e6578bf1f5c6ab8b72164b" },
-  "vim-startuptime": { "branch": "master", "commit": "454b3de856b7bd298700de33d79774ca9b9e3875" }
+  "vim-sqlx": { "branch": "main", "commit": "903d7d85d99e27b0b5e6578bf1f5c6ab8b72164b" }
 }
