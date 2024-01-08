@@ -10,7 +10,7 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
 -- copies to system clipboard in normal, visual modes
 vim.keymap.set({"n", "v"}, "Y", [["+y]])
--- copies to system clipboard in normal, visual modes from current cursor to end of line
+-- copies current line to system clipboard in normal & visual modes 
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 
