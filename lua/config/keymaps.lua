@@ -28,3 +28,5 @@ vim.keymap.set('n', '<leader>P', ':let @+ = expand("%:p") <CR>')
 vim.keymap.set('n', '<leader>p', ':let @+ = expand("%:t") <CR>')
 
 
+vim.api.nvim_set_keymap("n", "]q", ":cnext<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "[q", ":cprev<CR>", { noremap = true })
