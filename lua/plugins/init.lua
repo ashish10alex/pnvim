@@ -9,7 +9,8 @@ return {
     { 'tpope/vim-commentary'},
     { 'dstein64/vim-startuptime'},
     { 'inkarkat/vim-ReplaceWithRegister'},
-    { 'yuttie/comfortable-motion.vim', 
+    {  'andres-lowrie/vim-sqlx' },
+    { 'yuttie/comfortable-motion.vim',
         config = function()
             vim.g.comfortable_motion_friction = 80.0
             vim.g.comfortable_motion_air_drag = 12.0
