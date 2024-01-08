@@ -23,3 +23,8 @@ vim.keymap.set("n", "<leader><Right>", ":vertical resize -5<CR>")
 vim.keymap.set("n", "<leader><Down>", ":resize +5<CR>")
 vim.keymap.set("n", "<leader><Up>", ":resize -5<CR>")
 
+
+vim.keymap.set('n', '<leader>P', ':let @+ = expand("%:p") <CR>')
+vim.keymap.set('n', '<leader>p', ':let @+ = expand("%:t") <CR>')
+
+
