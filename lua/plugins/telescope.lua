@@ -4,6 +4,7 @@ return {
 		'nvim-lua/plenary.nvim' ,
 		{ 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
         "LinArcX/telescope-env.nvim",
+        "zane-/cder.nvim",
 	},
 	config = function()
         local grep_args = { '--hidden' }
@@ -47,17 +48,27 @@ return {
               override_file_sorter = true,     -- override the file sorter
               case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
                                                -- the default case_mode is "smart_case"
-            }
+            },
+            -- change current working directory in context of telescope
+            cder = {
+              dir_command = { 'fd', '--type=d', '.', vim.loop.cwd(), '--hidden', '--follow', '--exclude', '.git' },
+            },
           },
         }
+
         require('telescope').load_extension('fzf')
         require('telescope').load_extension('env')
+        require('telescope').load_extension('cder')
+
 		local builtin = require("telescope.builtin")
+
 		vim.keymap.set('n', '<leader>f', builtin.find_files, {})
         vim.keymap.set('n', '<leader>b', builtin.buffers, {})
         vim.keymap.set('n', '<leader>grep', builtin.live_grep, {})
-        vim.keymap.set('n', '<leader>greb', builtin.current_buffer_fuzzy_find, {})
+        -- vim.keymap.set('n', '<leader>greb', builtin.live_grep, {grep_on_open_files = true})
         vim.keymap.set('n', '<leader>h', builtin.help_tags, {})
         vim.keymap.set('n', '<leader>gf', builtin.git_files, {})
+        vim.keymap.set('n', '<leader>gd', builtin.lsp_definitions, {})
+
 	end,
 }
