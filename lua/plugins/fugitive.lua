@@ -1,7 +1,6 @@
 return {
     'tpope/vim-fugitive',
     dependencies = {
-        'vim-airline/vim-airline',
         'tpope/vim-rhubarb',
         'shumphrey/fugitive-gitlab.vim',
         'airblade/vim-gitgutter',

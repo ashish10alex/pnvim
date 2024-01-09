@@ -18,4 +18,12 @@ return {
             vim.g.comfortable_motion_scroll_up_key = "k"
         end
     },
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        config = function()
+            require('lualine').setup()
+        end
+    },
+
 }
