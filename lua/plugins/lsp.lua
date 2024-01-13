@@ -46,6 +46,7 @@ return {
                 "pyright",
                 "tsserver",
                 "bashls",
+                "gopls",
           },
           handlers = {
 
