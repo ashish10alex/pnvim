@@ -1,2 +1,3 @@
-dataform compile --json | {echo "-- $(date)" ; jq -r '.[]?| values[]?| "\n -- " + .fileName? + "\n  " +.query?'} > /tmp/temp.sqlx 
+dataform compile --json | jq -r '.tables | map("-- \(.fileName)\n-- \(.tags)\n\(.query) ;") | join("\n")'  > /tmp/temp.sqlx ;
+dataform compile --json | jq -r '.assertions | map("-- \(.fileName)\n-- \(.tags)\n\(.query) ;") | join("\n")' >>  /tmp/temp.sqlx
 
