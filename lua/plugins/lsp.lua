@@ -19,17 +19,20 @@ return {
         -- end
 
         local capabilities = require('cmp_nvim_lsp').default_capabilities()
+        local bufopts = { noremap=true, silent=true, buffer=0 }
         local on_attach = function()
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, {buffer=0})
-            vim.keymap.set("n", "L", vim.lsp.buf.signature_help, {buffer=0})
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, {buffer=0})
-            vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, {buffer=0})
-            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {buffer=0})
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {buffer=0})
-            vim.keymap.set("n", "]e", vim.diagnostic.goto_next, {buffer=0})
-            vim.keymap.set("n", "[e", vim.diagnostic.goto_prev, {buffer=0})
-            vim.keymap.set("n", "qe", vim.diagnostic.setqflist, {buffer=0})
-            vim.keymap.set("n", "ga", vim.lsp.buf.code_action, {buffer=0})
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+            vim.keymap.set("n", "L", vim.lsp.buf.signature_help, bufopts)
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+            -- vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+            vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, bufopts)
+            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, bufopts)
+            vim.keymap.set("n", "]e", vim.diagnostic.goto_next, bufopts)
+            vim.keymap.set("n", "[e", vim.diagnostic.goto_prev, bufopts)
+            vim.keymap.set("n", "qe", vim.diagnostic.setqflist, bufopts)
+            vim.keymap.set("n", "ga", vim.lsp.buf.code_action, bufopts)
+            vim.keymap.set('n', '<space>k', function() vim.lsp.buf.format { async = true } end, bufopts)
             vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
                 vim.lsp.diagnostic.on_publish_diagnostics, {
                     severity_sort = { reverse = false }

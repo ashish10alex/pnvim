@@ -89,6 +89,8 @@ return {
         vim.keymap.set('n', '<leader>gf', builtin.git_files, {})
         vim.keymap.set('n', '<leader>gd', builtin.lsp_definitions, {})
         vim.keymap.set('n', '<leader>de', builtin.diagnostics, {})
+        vim.keymap.set('n', '<leader>gv', builtin.lsp_references, {})
+
 
 	end,
 }
