@@ -35,6 +35,10 @@ return {
                     severity_sort = { reverse = false }
                 }
             )
+            -- Show line diagnostics automatically in hover window
+            vim.cmd([[
+              autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, { focus = false })
+            ]])
         end
 
         require("mason").setup()
@@ -47,6 +51,7 @@ return {
                 "tsserver",
                 "bashls",
                 "gopls",
+                -- "sqlls",
           },
           handlers = {
 
@@ -69,6 +74,17 @@ return {
                        }
                    }
                end,
+
+              -- ["sqlls"] = function()
+              --       local lspconfig = require("lspconfig")
+              --       lspconfig.sqlls.setup {
+              --           cmd = { "sql-language-server", "up", "--method", "stdio"},
+              --           filetypes = { "sql" },
+              --           root_dir = function() return vim.loop.cwd() end;
+              --           on_attach = on_attach,
+              --           capabilities = capabilities,
+              --       }
+              --   end,
 
           }
         })
