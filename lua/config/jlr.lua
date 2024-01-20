@@ -19,8 +19,21 @@ local find_buffer_by_name = function(name)
   return -1
 end
 
+local read_stderr_and_get_line_col_numbers = function(stderr_message)
+    local line_number, column_index = stderr_message:match("%[(%d+):(%d+)%]")
+    -- print("line_number: " .. line_number)
+    -- print("column_index: " .. column_index)
+    line_number = tonumber(line_number) - 1 -- lua is 1 indexed
+    column_index = tonumber(column_index)
+    return line_number, column_index
+end
+
 local plenary_test = function()
     local GCP_PROJECT_ID_DEV = os.getenv("GCP_PROJECT_ID_DEV")
+
+    local lnum = 0
+    local col = 0
+    local stderr_message = nil
 
     local Job = require'plenary.job'
     Job:new({
@@ -34,7 +47,10 @@ local plenary_test = function()
       end,
 
       on_stderr = function(j, data)
-        print(vim.inspect("stderr: " .. data))
+        if data ~= nil then
+            stderr_message = data
+            lnum, col = read_stderr_and_get_line_col_numbers(data)
+        end
       end,
 
       on_exit = function(j, return_val) -- TODO: Handle stderr and stdout separately
@@ -43,6 +59,7 @@ local plenary_test = function()
       end,
 
     }):sync() -- or start()
+    return lnum, col, stderr_message
 end
 
 local compile_dataform = function()
@@ -55,15 +72,15 @@ local compile_dataform = function()
 
     if bufnr ~= -1 then -- buffer already open
         -- TODO: clear previous the diagnostics ?
-        plenary_test()
-        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=55, col=1, end_col=2, severity = vim.diagnostic.severity.ERROR, message = "Syntax error NEW: BigQuery test",}}, {}) -- TODO: get the line number from another cli output
+        local lnum, col, stderr_message = plenary_test()
+        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
         vim.api.nvim_command("edit")
 
     else -- buffer not open, create a new one
-        plenary_test()
+        local lnum, col, stderr_message = plenary_test()
         vim.api.nvim_command("vsplit " .. buf_name)
-        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=55, col=1, end_col=2, severity = vim.diagnostic.severity.ERROR, message = "Syntax error: BigQuery test",}}, {}) -- TODO: get the line number from another cli output
+        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
 
     end
