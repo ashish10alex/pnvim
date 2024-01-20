@@ -28,10 +28,20 @@ local plenary_test = function()
       args = { '/private/tmp/temp.sqlx' }, -- TODO: why /private ?
       cwd = '/usr/bin',
       env = { ['GCP_PROJECT_ID_DEV'] = GCP_PROJECT_ID_DEV },
-      on_exit = function(j, return_val) -- TODO: Handle stderr and stdout separately
-        print(vim.inspect(return_val))
-        print(vim.inspect(j:result()))
+
+      on_stdout = function(j, data)
+        print(vim.inspect("stdout: " .. data))
       end,
+
+      on_stderr = function(j, data)
+        print(vim.inspect("stderr: " .. data))
+      end,
+
+      on_exit = function(j, return_val) -- TODO: Handle stderr and stdout separately
+         print(vim.inspect("exit: " .. return_val))
+         print(vim.inspect(j:result()))
+      end,
+
     }):sync() -- or start()
 end
 
