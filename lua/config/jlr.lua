@@ -19,6 +19,22 @@ local find_buffer_by_name = function(name)
   return -1
 end
 
+local plenary_test = function()
+    local GCP_PROJECT_ID_DEV = os.getenv("GCP_PROJECT_ID_DEV")
+
+    local Job = require'plenary.job'
+    Job:new({
+      command = '/Users/ashishalex/Documents/work/jlr/repos/test/go_dry_run/go_dry_run',
+      args = { '/private/tmp/temp.sqlx' },
+      cwd = '/usr/bin',
+      env = { ['GCP_PROJECT_ID_DEV'] = GCP_PROJECT_ID_DEV },
+      on_exit = function(j, return_val)
+        print(vim.inspect(return_val))
+        print(vim.inspect(j:result()))
+      end,
+    }):sync() -- or start()
+end
+
 local compile_dataform = function()
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
     local dataform_compile_cmd = read_file(dataform_compile_cmd_path)
@@ -29,11 +45,13 @@ local compile_dataform = function()
 
     if bufnr ~= -1 then -- buffer already open
         -- TODO: clear previous the diagnostics ?
+        plenary_test()
         vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=55, col=1, end_col=2, severity = vim.diagnostic.severity.ERROR, message = "Syntax error NEW: BigQuery test",}}, {}) -- TODO: get the line number from another cli output
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
         vim.api.nvim_command("edit")
 
     else -- buffer not open, create a new one
+        plenary_test()
         vim.api.nvim_command("vsplit " .. buf_name)
         vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=55, col=1, end_col=2, severity = vim.diagnostic.severity.ERROR, message = "Syntax error: BigQuery test",}}, {}) -- TODO: get the line number from another cli output
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
