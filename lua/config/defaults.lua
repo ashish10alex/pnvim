@@ -46,3 +46,16 @@ vim.o.foldmethod = "indent" -- Set folding method to indent
 vim.o.foldlevel = 99     -- Set initial fold level to 99 (closed)
 vim.o.clipboard = "unnamedplus" -- Use system clipboard
 vim.cmd("highlight Comment cterm=italic") -- Highlight comments in italics
+
+
+-- ** Hack to make diagnostics work for CompileDataform **
+-- Show line diagnostics automatically in hover window
+vim.cmd([[
+    autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, { focus = false })
+]])
+
+-- Doing this as the lsp one was not working as we donot have a lsp for sql yet!
+vim.cmd([[
+    nnoremap <silent> ]e <cmd>lua vim.diagnostic.goto_next({popup_opts = {focusable=false}})<CR>
+    nnoremap <silent> [e <cmd>lua vim.diagnostic.goto_prev({popup_opts = {focusable=false}})<CR>
+]])
