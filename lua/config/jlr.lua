@@ -20,7 +20,7 @@ local find_buffer_by_name = function(name)
 end
 
 local read_stderr_and_get_line_col_numbers = function(stderr_message)
-    local line_number, column_index = stderr_message:match("%[(%d+):(%d+)%]")
+    local line_number, column_index = stderr_message:match("%[(%d+):(%d+)%]") -- takes out [line_number:column_index] from the stderr message
     -- print("line_number: " .. line_number)
     -- print("column_index: " .. column_index)
     line_number = tonumber(line_number) - 1 -- lua is 1 indexed
@@ -71,16 +71,22 @@ local compile_dataform = function()
     local bufnr = find_buffer_by_name(buf_name)
 
     if bufnr ~= -1 then -- buffer already open
-        -- TODO: clear previous the diagnostics ?
+        -- TODO: clear previous the diagnostics (Can we do better - whats 1 and 0 (namespace, bufnr) ?)
+        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
         local lnum, col, stderr_message = plenary_test()
-        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
-        vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
-        vim.api.nvim_command("edit")
+        if stderr_message ~= nil then
+            vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
+        end
+        vim.api.nvim_command("wincmd h")  -- move the cursor to this buffer
+        vim.api.nvim_command("edit")      -- refresh the buffer
+        vim.api.nvim_command("normal gg") -- goto top of the file
 
     else -- buffer not open, create a new one
         local lnum, col, stderr_message = plenary_test()
         vim.api.nvim_command("vsplit " .. buf_name)
-        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
+        if stderr_message ~= nil then
+            vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
+        end
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
 
     end
