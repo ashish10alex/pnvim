@@ -24,11 +24,11 @@ local plenary_test = function()
 
     local Job = require'plenary.job'
     Job:new({
-      command = '/Users/ashishalex/Documents/work/jlr/repos/test/go_dry_run/go_dry_run',
-      args = { '/private/tmp/temp.sqlx' },
+      command = '/Users/ashishalex/Documents/work/jlr/repos/test/go_dry_run/go_dry_run', -- TODO Add go_dry_run to path
+      args = { '/private/tmp/temp.sqlx' }, -- TODO: why /private ?
       cwd = '/usr/bin',
       env = { ['GCP_PROJECT_ID_DEV'] = GCP_PROJECT_ID_DEV },
-      on_exit = function(j, return_val)
+      on_exit = function(j, return_val) -- TODO: Handle stderr and stdout separately
         print(vim.inspect(return_val))
         print(vim.inspect(j:result()))
       end,
