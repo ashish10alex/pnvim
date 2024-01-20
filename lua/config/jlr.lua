@@ -65,7 +65,7 @@ end
 local compile_dataform = function()
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
     local dataform_compile_cmd = read_file(dataform_compile_cmd_path)
-    local output = vim.fn.system(dataform_compile_cmd) -- output is sent to a file using >>
+    local output = vim.fn.system(dataform_compile_cmd) -- output is sent to a file /private/tmp/temp.sqlx
 
     local buf_name = "/private/tmp/temp.sqlx"
     local bufnr = find_buffer_by_name(buf_name)
