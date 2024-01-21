@@ -28,7 +28,7 @@ local read_stderr_and_get_line_col_numbers = function(stderr_message)
     return line_number, column_index
 end
 
-local plenary_test = function()
+local compile_sql_on_bigquery_backend = function()
     local GCP_PROJECT_ID_DEV = os.getenv("GCP_PROJECT_ID_DEV")
 
     local lnum = 0
@@ -70,10 +70,10 @@ local compile_dataform = function()
     local buf_name = "/private/tmp/temp.sqlx"
     local bufnr = find_buffer_by_name(buf_name)
 
+    local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
     if bufnr ~= -1 then -- buffer already open
         -- TODO: clear previous the diagnostics (Can we do better - whats 1 and 0 (namespace, bufnr) ?)
         vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
-        local lnum, col, stderr_message, stdout_message = plenary_test()
 
         -- TODO: Convert this paragraph to a function
         local diagnostics_table = {}
@@ -89,8 +89,6 @@ local compile_dataform = function()
         vim.api.nvim_command("normal gg") -- goto top of the file
 
     else -- Buffer not open, create a new one
-        local lnum, col, stderr_message, stdout_message = plenary_test() -- TODO: This can be moved before the if else block
-
         local diagnostics_table = {}
         diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
 
