@@ -48,7 +48,6 @@ local plenary_test = function()
       end,
 
       on_stderr = function(j, data)
-        print("stderr data: " .. data)
         if data ~= nil then
             stderr_message = data
             lnum, col = read_stderr_and_get_line_col_numbers(data)
