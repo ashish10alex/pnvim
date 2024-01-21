@@ -34,6 +34,7 @@ local plenary_test = function()
     local lnum = 0
     local col = 0
     local stderr_message = nil
+    local stdout_message = nil
 
     local Job = require'plenary.job'
     Job:new({
@@ -43,7 +44,7 @@ local plenary_test = function()
       env = { ['GCP_PROJECT_ID_DEV'] = GCP_PROJECT_ID_DEV },
 
       on_stdout = function(j, data)
-        print(vim.inspect("stdout: " .. data))
+        stdout_message = data
       end,
 
       on_stderr = function(j, data)
@@ -54,12 +55,11 @@ local plenary_test = function()
       end,
 
       on_exit = function(j, return_val) -- TODO: Handle stderr and stdout separately
-         print(vim.inspect("exit: " .. return_val))
-         print(vim.inspect(j:result()))
+         -- print(vim.inspect(j:result()))
       end,
 
     }):sync() -- or start()
-    return lnum, col, stderr_message
+    return lnum, col, stderr_message, stdout_message
 end
 
 local compile_dataform = function()
@@ -73,20 +73,23 @@ local compile_dataform = function()
     if bufnr ~= -1 then -- buffer already open
         -- TODO: clear previous the diagnostics (Can we do better - whats 1 and 0 (namespace, bufnr) ?)
         vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
-        local lnum, col, stderr_message = plenary_test()
+        local lnum, col, stderr_message, stdout_message = plenary_test()
         if stderr_message ~= nil then
             vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
         end
+
+        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}}, {}) -- Show query cost as diagnostic on top of the file
         vim.api.nvim_command("wincmd h")  -- move the cursor to this buffer
         vim.api.nvim_command("edit")      -- refresh the buffer
         vim.api.nvim_command("normal gg") -- goto top of the file
 
     else -- buffer not open, create a new one
-        local lnum, col, stderr_message = plenary_test()
+        local lnum, col, stderr_message, stdout_message = plenary_test()
         vim.api.nvim_command("vsplit " .. buf_name)
         if stderr_message ~= nil then
             vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}}, {}) -- TODO: get the line number from another cli output
         end
+        vim.diagnostic.set(1, 0, {{bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}}, {}) -- Show query cost as diagnostic on top of the file
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
 
     end
