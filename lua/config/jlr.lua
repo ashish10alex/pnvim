@@ -30,6 +30,7 @@ end
 
 local compile_sql_on_bigquery_backend = function()
     local GCP_PROJECT_ID_DEV = os.getenv("GCP_PROJECT_ID_DEV")
+    local TIMEOUT = 10000 -- go_dry_run must return in 10 seconds!!
 
     local lnum = 0
     local col = 0
@@ -59,7 +60,7 @@ local compile_sql_on_bigquery_backend = function()
          -- print(vim.inspect(j:result()))
       end,
 
-    }):sync(10000) -- or start()
+    }):sync(TIMEOUT) -- or start()
     return lnum, col, stderr_message, stdout_message
 end
 
@@ -78,8 +79,10 @@ local process_dianostics = function(bufnr, lnum, col, stderr_message, stdout_mes
 end
 
 local compile_dataform = function()
+
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
     -- local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_all.sh"
+
     local dataform_compile_cmd = read_file(dataform_compile_cmd_path)
     local output = vim.fn.system(dataform_compile_cmd) -- output is sent to a file /private/tmp/temp.sqlx; TODO: Use plenary to capture stdout and stderr
 
