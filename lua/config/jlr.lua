@@ -50,6 +50,7 @@ local compile_sql_on_bigquery_backend = function()
       on_stderr = function(j, data)
         if data ~= nil then
             stderr_message = data
+            stdout_message = "ERROR!!!: " .. data
             lnum, col = read_stderr_and_get_line_col_numbers(data)
         end
       end,
@@ -58,12 +59,13 @@ local compile_sql_on_bigquery_backend = function()
          -- print(vim.inspect(j:result()))
       end,
 
-    }):sync() -- or start()
+    }):sync(10000) -- or start()
     return lnum, col, stderr_message, stdout_message
 end
 
 local compile_dataform = function()
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
+    -- local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_all.sh"
     local dataform_compile_cmd = read_file(dataform_compile_cmd_path)
     local output = vim.fn.system(dataform_compile_cmd) -- output is sent to a file /private/tmp/temp.sqlx; TODO: Use plenary to capture stdout and stderr
 
@@ -71,10 +73,11 @@ local compile_dataform = function()
     local bufnr = find_buffer_by_name(buf_name)
 
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
-    if bufnr ~= -1 then -- buffer already open
-        -- TODO: clear previous the diagnostics (Can we do better - whats 1 and 0 (namespace, bufnr) ?)
-        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
 
+    -- TODO: clear previous the diagnostics (Can we do better - whats 1 and 0 (namespace, bufnr) ?)
+    vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
+
+    if bufnr ~= -1 then -- buffer already open
         -- TODO: Convert this paragraph to a function
         local diagnostics_table = {}
         diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
@@ -84,7 +87,8 @@ local compile_dataform = function()
 
         vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
 
-        vim.api.nvim_command("wincmd h")  -- move the cursor to this buffer
+        vim.api.nvim_command("wincmd h")  -- move the cursor to the left buffer
+        vim.api.nvim_command("wincmd k")  -- move the cursor to the top buffer
         vim.api.nvim_command("edit")      -- refresh the buffer
         vim.api.nvim_command("normal gg") -- goto top of the file
 
