@@ -38,10 +38,6 @@ return {
                     severity_sort = { reverse = false }
                 }
             )
-            -- Show line diagnostics automatically in hover window
-            vim.cmd([[
-              autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, { focus = false })
-            ]])
         end
 
         require("mason").setup()
@@ -68,13 +64,21 @@ return {
                ["lua_ls"] = function ()
                    local lspconfig = require("lspconfig")
                    lspconfig.lua_ls.setup {
-                       settings = {
-                           Lua = {
-                               diagnostics = {
-                                   globals = { "vim", "feedkey", "has_words_before" },
-                               }
-                           }
-                       }
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                        settings = {
+                          Lua = {
+                            diagnostics = {
+                              globals = { 'vim', 'feedkey', 'has_words_before' }
+                            },
+                            workspace = {
+                              library = {
+                                [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+                                [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true
+                              }
+                            }
+                          }
+                        }
                    }
                end,
 
