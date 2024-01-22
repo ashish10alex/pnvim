@@ -51,7 +51,7 @@ vim.cmd("highlight Comment cterm=italic") -- Highlight comments in italics
 -- ** Hack to make diagnostics work for CompileDataform **
 -- Show line diagnostics automatically in hover window
 vim.cmd([[
-    autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, { focus = false })
+    autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float({severity=vim.diagnostic.severity.ERROR}, {focus=false})
 ]])
 
 -- Doing this as the lsp one was not working as we donot have a lsp for sql yet!
