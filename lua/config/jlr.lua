@@ -71,9 +71,11 @@ end
 -- @param stdout_message: string
 local process_dianostics = function(bufnr, lnum, col, stderr_message, stdout_message)
     local diagnostics_table = {}
-    diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
     if stderr_message ~= nil then
+        diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
         diagnostics_table[2] = {bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
+    else
+        diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
     end
     return diagnostics_table
 end
@@ -92,12 +94,16 @@ local compile_dataform = function()
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
     -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
-    vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
+    if bufnr ~= -1 then
+        vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
+    else
+        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
+    end
 
     local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
 
     if bufnr ~= -1 then -- buffer already open
-        vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
+        vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
 
         vim.api.nvim_command("wincmd h")  -- move the cursor to the left buffer
         vim.api.nvim_command("wincmd k")  -- move the cursor to the top buffer
