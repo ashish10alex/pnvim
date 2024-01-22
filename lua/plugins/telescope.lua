@@ -84,6 +84,11 @@ return {
             builtin.grep_string({search = word})
         end)
 
+        vim.keymap.set('n', '<leader>gdf', function() -- make it easier to search Dataform files references by $ref{file_name}
+            local word = vim.fn.expand("<cword>")
+            builtin.find_files({search_file = word})
+        end)
+
         -- vim.keymap.set('n', '<leader>greb', builtin.live_grep, {grep_on_open_files = true})
         vim.keymap.set('n', '<leader>h', builtin.help_tags, {})
         vim.keymap.set('n', '<leader>gf', builtin.git_files, {})
