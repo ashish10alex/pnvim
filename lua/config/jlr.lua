@@ -63,6 +63,20 @@ local compile_sql_on_bigquery_backend = function()
     return lnum, col, stderr_message, stdout_message
 end
 
+-- @param bufnr: number
+-- @param lnum: number
+-- @param col: number
+-- @param stderr_message: string
+-- @param stdout_message: string
+local process_dianostics = function(bufnr, lnum, col, stderr_message, stdout_message)
+    local diagnostics_table = {}
+    diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
+    if stderr_message ~= nil then
+        diagnostics_table[2] = {bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
+    end
+    return diagnostics_table
+end
+
 local compile_dataform = function()
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
     -- local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_all.sh"
@@ -74,17 +88,12 @@ local compile_dataform = function()
 
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
-    -- TODO: clear previous the diagnostics (Can we do better - whats 1 and 0 (namespace, bufnr) ?)
+    -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
     vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
 
-    if bufnr ~= -1 then -- buffer already open
-        -- TODO: Convert this paragraph to a function
-        local diagnostics_table = {}
-        diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
-        if stderr_message ~= nil then
-            diagnostics_table[2] = {bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
-        end
+    local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
 
+    if bufnr ~= -1 then -- buffer already open
         vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
 
         vim.api.nvim_command("wincmd h")  -- move the cursor to the left buffer
@@ -93,18 +102,15 @@ local compile_dataform = function()
         vim.api.nvim_command("normal gg") -- goto top of the file
 
     else -- Buffer not open, create a new one
-        local diagnostics_table = {}
-        diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.INFO, message = stdout_message,}
-
-        if stderr_message ~= nil then
-            diagnostics_table[2] = {bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
-        end
-
         vim.api.nvim_command("vsplit " .. buf_name)
         vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
-
     end
 end
+
+local compile_dataform_file = function()
+end
+
 vim.api.nvim_create_user_command("CompileDataform", compile_dataform, {})
+vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {})
 
