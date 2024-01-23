@@ -212,6 +212,6 @@ local compile_dataform_wt_tag = function(args)
 end
 
 vim.api.nvim_create_user_command("CompileDataform", compile_dataform, {})
-vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {nargs='*'})
+vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {})
 vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag, {nargs='*'})
 
