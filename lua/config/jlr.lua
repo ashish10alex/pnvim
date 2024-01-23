@@ -153,6 +153,14 @@ local compile_dataform_file = function()
     local filepath_wrt_project_root = vim.fn.expand("%h")
     print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
+    -- check if file ends with .sqlx
+
+    local file_extension = vim.fn.expand("%:e")
+    if file_extension ~= "sqlx" then
+        error("File extension must be .sqlx")
+        return
+    end
+
     local dataform_compile_file_cmd = [[
         echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
