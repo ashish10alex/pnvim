@@ -20,12 +20,17 @@ local find_buffer_by_name = function(name)
 end
 
 local read_stderr_and_get_line_col_numbers = function(stderr_message)
-    local line_number, column_index = stderr_message:match("%[(%d+):(%d+)%]") -- takes out [line_number:column_index] from the stderr message
-    -- print("line_number: " .. line_number)
-    -- print("column_index: " .. column_index)
-    line_number = tonumber(line_number) - 1 -- lua is 1 indexed
-    column_index = tonumber(column_index)
-    return line_number, column_index
+    local line_number = 0
+    local column_index = 0
+    local _line_number, _column_index = stderr_message:match("%[(%d+):(%d+)%]") -- takes out [line_number:column_index] from the stderr message
+    if _line_number ~= nil and _column_index ~= nil then
+        line_number, column_index = _line_number, _column_index
+        line_number = tonumber(line_number) - 1 -- lua is 1 indexed
+        column_index = tonumber(column_index)
+        return line_number, column_index
+    else
+        return line_number, column_index
+    end
 end
 
 local compile_sql_on_bigquery_backend = function()
@@ -119,6 +124,7 @@ end
 local compile_dataform_file = function()
     -- get filename from the root directory of the project
     local filepath_wrt_project_root = vim.fn.expand("%h")
+    print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
     local dataform_compile_cmd = [[
         echo "-- $(date)" > /tmp/temp.sqlx
