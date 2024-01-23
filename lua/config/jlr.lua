@@ -122,12 +122,12 @@ local compile_dataform = function()
 end
 
 local compile_dataform_file = function()
-    -- get filename from the root directory of the project
+
     local filepath_wrt_project_root = vim.fn.expand("%h")
     print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
-    local dataform_compile_cmd = [[
-        echo "-- $(date)" > /tmp/temp.sqlx
+    local dataform_compile_file_cmd = [[
+        echo "-- $(date)" > /private/tmp/temp.sqlx
 
         dataform compile --json | \
         jq -r '.tables[] |
@@ -139,7 +139,8 @@ local compile_dataform_file = function()
         select( .fileName == "]].. filepath_wrt_project_root.. [[") |
         "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> /private/tmp/temp.sqlx ;
     ]]
-    local output = vim.fn.system(dataform_compile_cmd)
+
+    local output = vim.fn.system(dataform_compile_file_cmd)
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
     local buf_name = "/private/tmp/temp.sqlx"
@@ -164,6 +165,53 @@ local compile_dataform_file = function()
     end
 end
 
+local compile_dataform_wt_tag = function(args)
+    local tagsString = ""
+    local buf_name = "/private/tmp/temp.sqlx"
+
+    if args == nil then
+        print("No args passed")
+    else
+        -- print(vim.inspect(args))
+        local parsedArgs = args.fargs
+        for _, tag in ipairs(parsedArgs) do
+            tagsString = tagsString .. '--tags=' .. tag .. ' '
+        end
+
+    end
+
+    local dataform_compile_cmd_wt_tag = [[
+        echo "-- $(date)" > ]] .. buf_name .. [[ ;
+        dataform run --dry-run  --json  ]] .. tagsString ..  [[  | jq -r '.actions | .[] | "-- " +  .tableType + " \n -- " + .fileName + "\n \n" + .tasks[].statement + " \n ;" ' >> ]] .. buf_name .. [[
+    ]]
+    print('dataform_compile_cmd_wt_tag: ' .. vim.inspect(dataform_compile_cmd_wt_tag))
+
+    local output = vim.fn.system(dataform_compile_cmd_wt_tag)
+    local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
+
+    local bufnr = find_buffer_by_name(buf_name)
+
+    -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
+    if bufnr ~= -1 then
+        vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
+    else
+        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
+    end
+
+    local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
+
+    if bufnr ~= -1 then -- buffer already open
+        vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
+        vim.api.nvim_set_current_buf(bufnr) -- move the cursor to this buffer
+        vim.api.nvim_command("normal gg") -- goto top of the file
+    else -- Buffer not open, create a new one
+        vim.api.nvim_command("edit " .. buf_name)
+        vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
+    end
+
+end
+
 vim.api.nvim_create_user_command("CompileDataform", compile_dataform, {})
-vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {})
+vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {nargs='*'})
+vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag, {nargs='*'})
 
