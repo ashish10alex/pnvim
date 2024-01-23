@@ -1,4 +1,6 @@
 
+SQL_OUT_BUF_PATH = "/private/tmp/temp.sqlx"
+
 local read_file = function(path)
   local file = io.open(path, "rb")
   if not file then return nil end
@@ -10,13 +12,33 @@ end
 local find_buffer_by_name = function(name)
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     local buf_name = vim.api.nvim_buf_get_name(bufnr)
-    -- print("searching buffer" .. buf_name .. " with bufnr: " .. bufnr)
     if buf_name == name then
-      -- print("found buffer" .. buf_name .. " with bufnr: " .. bufnr)
       return bufnr
     end
   end
   return -1
+end
+
+local reset_diagnostics = function(bufnr)
+    -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
+    if bufnr ~= -1 then
+        vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
+    else
+        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
+    end
+end
+
+local parse_dataform_tags = function(args)
+    local tagsString = ""
+    if args == nil then
+        print("No args passed")
+    else
+        local parsedArgs = args.fargs
+        for _, tag in ipairs(parsedArgs) do
+            tagsString = tagsString .. '--tags=' .. tag .. ' '
+        end
+    end
+    return tagsString
 end
 
 local read_stderr_and_get_line_col_numbers = function(stderr_message)
@@ -30,6 +52,17 @@ local read_stderr_and_get_line_col_numbers = function(stderr_message)
         return line_number, column_index
     else
         return line_number, column_index
+    end
+end
+
+local set_diagnostics_to_buffer = function(bufnr, diagnostics_table, buf_name)
+    if bufnr ~= -1 then -- buffer already open
+        vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
+        vim.api.nvim_set_current_buf(bufnr) -- move the cursor to this buffer
+        vim.api.nvim_command("normal gg") -- goto top of the file
+    else -- Buffer not open, create a new one
+        vim.api.nvim_command("edit " .. buf_name)
+        vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
     end
 end
 
@@ -92,17 +125,11 @@ local compile_dataform = function()
     local dataform_compile_cmd = read_file(dataform_compile_cmd_path)
     local output = vim.fn.system(dataform_compile_cmd) -- output is sent to a file /private/tmp/temp.sqlx; TODO: Use plenary to capture stdout and stderr
 
-    local buf_name = "/private/tmp/temp.sqlx"
-    local bufnr = find_buffer_by_name(buf_name)
+    local bufnr = find_buffer_by_name(SQL_OUT_BUF_PATH)
+    reset_diagnostics(bufnr)
 
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
-    -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
-    if bufnr ~= -1 then
-        vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
-    else
-        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
-    end
 
     local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
 
@@ -115,7 +142,7 @@ local compile_dataform = function()
         vim.api.nvim_command("normal gg") -- goto top of the file
 
     else -- Buffer not open, create a new one
-        vim.api.nvim_command("vsplit " .. buf_name)
+        vim.api.nvim_command("vsplit " .. SQL_OUT_BUF_PATH)
         vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
         vim.api.nvim_command("wincmd h") -- move the cursor to this buffer and execute edit to load the file
     end
@@ -127,87 +154,47 @@ local compile_dataform_file = function()
     print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
     local dataform_compile_file_cmd = [[
-        echo "-- $(date)" > /private/tmp/temp.sqlx
+        echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
         dataform compile --json | \
         jq -r '.tables[] |
         select( .fileName == "]].. filepath_wrt_project_root.. [[") |
-        "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> /private/tmp/temp.sqlx ;
+        "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
         dataform compile --json | \
         jq -r '.assertions[] |
         select( .fileName == "]].. filepath_wrt_project_root.. [[") |
-        "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> /private/tmp/temp.sqlx ;
+        "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
     ]]
 
-    local output = vim.fn.system(dataform_compile_file_cmd)
+    local _ = vim.fn.system(dataform_compile_file_cmd)
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
-    local buf_name = "/private/tmp/temp.sqlx"
-    local bufnr = find_buffer_by_name(buf_name)
+    local bufnr = find_buffer_by_name(SQL_OUT_BUF_PATH)
 
-    -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
-    if bufnr ~= -1 then
-        vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
-    else
-        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
-    end
-
+    reset_diagnostics(bufnr)
     local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
+    set_diagnostics_to_buffer(bufnr, diagnostics_table, SQL_OUT_BUF_PATH)
 
-    if bufnr ~= -1 then -- buffer already open
-        vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
-        vim.api.nvim_set_current_buf(bufnr) -- move the cursor to this buffer
-        vim.api.nvim_command("normal gg") -- goto top of the file
-    else -- Buffer not open, create a new one
-        vim.api.nvim_command("edit " .. buf_name)
-        vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
-    end
 end
 
+
 local compile_dataform_wt_tag = function(args)
-    local tagsString = ""
-    local buf_name = "/private/tmp/temp.sqlx"
 
-    if args == nil then
-        print("No args passed")
-    else
-        -- print(vim.inspect(args))
-        local parsedArgs = args.fargs
-        for _, tag in ipairs(parsedArgs) do
-            tagsString = tagsString .. '--tags=' .. tag .. ' '
-        end
-
-    end
+    local tagsString = parse_dataform_tags(args)
 
     local dataform_compile_cmd_wt_tag = [[
-        echo "-- $(date)" > ]] .. buf_name .. [[ ;
-        dataform run --dry-run  --json  ]] .. tagsString ..  [[  | jq -r '.actions | .[] | "-- " +  .tableType + " \n -- " + .fileName + "\n \n" + .tasks[].statement + " \n ;" ' >> ]] .. buf_name .. [[
+        echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
+        dataform run --dry-run  --json  ]] .. tagsString ..  [[  | jq -r '.actions | .[] | "-- " +  .tableType + " \n -- " + .fileName + "\n \n" + .tasks[].statement + " \n ;" ' >> ]] .. SQL_OUT_BUF_PATH .. [[
     ]]
-    print('dataform_compile_cmd_wt_tag: ' .. vim.inspect(dataform_compile_cmd_wt_tag))
 
-    local output = vim.fn.system(dataform_compile_cmd_wt_tag)
+    local _ = vim.fn.system(dataform_compile_cmd_wt_tag)
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
-    local bufnr = find_buffer_by_name(buf_name)
-
-    -- TODO: Can we do better - what are 1 and 0 (namespace, bufnr) ?)
-    if bufnr ~= -1 then
-        vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
-    else
-        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
-    end
-
+    local bufnr = find_buffer_by_name(SQL_OUT_BUF_PATH)
+    reset_diagnostics(bufnr)
     local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
-
-    if bufnr ~= -1 then -- buffer already open
-        vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
-        vim.api.nvim_set_current_buf(bufnr) -- move the cursor to this buffer
-        vim.api.nvim_command("normal gg") -- goto top of the file
-    else -- Buffer not open, create a new one
-        vim.api.nvim_command("edit " .. buf_name)
-        vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
-    end
+    set_diagnostics_to_buffer(bufnr, diagnostics_table, SQL_OUT_BUF_PATH)
 
 end
 
