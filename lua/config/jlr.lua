@@ -160,6 +160,11 @@ end
 
 local compile_dataform_file = function()
 
+    local in_dataform_project_root = check_if_cwd_is_dataform_project_root()
+    if in_dataform_project_root == nil then
+        return
+    end
+
     local filepath_wrt_project_root = vim.fn.expand("%h")
     print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
@@ -198,6 +203,11 @@ end
 
 
 local compile_dataform_wt_tag = function(args)
+
+    local in_dataform_project_root = check_if_cwd_is_dataform_project_root()
+    if in_dataform_project_root == nil then
+        return
+    end
 
     local tagsString = parse_dataform_tags(args)
 
