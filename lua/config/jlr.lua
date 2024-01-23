@@ -30,15 +30,24 @@ end
 
 local parse_dataform_tags = function(args)
     local tagsString = ""
+    local include_deps = false
     if args == nil then
         print("No args passed")
     else
-        local parsedArgs = args.fargs
-        for _, tag in ipairs(parsedArgs) do
-            tagsString = tagsString .. '--tags=' .. tag .. ' '
+        local parsedArgs = args.args
+        local test = load("return " .. parsedArgs)() -- load the string as a lua table
+        include_deps = test.include_deps
+
+        -- print('test.tags: ' .. vim.inspect(test.tags))
+        -- print('test.include_deps ' .. vim.inspect(test.include_deps))
+
+        for w in test.tags:gmatch("([^,]+)") do -- split the string by comma
+            w = string.gsub(w, "%s+", "") -- trim white space
+            tagsString = tagsString .. '--tags=' .. w .. ' '
         end
+
     end
-    return tagsString
+    return tagsString, include_deps
 end
 
 local read_stderr_and_get_line_col_numbers = function(stderr_message)
@@ -210,7 +219,11 @@ local compile_dataform_wt_tag = function(args)
         return
     end
 
-    local tagsString = parse_dataform_tags(args)
+    local tagsString, include_deps = parse_dataform_tags(args)
+    print('tagsString: ' .. tagsString .. ' include_deps: ' .. vim.inspect(include_deps))
+    if include_deps == true then
+        tagsString = tagsString .. '--include-deps '
+    end
 
     local dataform_compile_cmd_wt_tag = [[
         echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
