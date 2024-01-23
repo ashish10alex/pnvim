@@ -117,6 +117,16 @@ local process_dianostics = function(bufnr, lnum, col, stderr_message, stdout_mes
     return diagnostics_table
 end
 
+local check_if_cwd_is_dataform_project_root = function()
+    local dataform_json_file_path = vim.loop.cwd() .. "/dataform.json"
+    local dataform_json_file_exists = vim.fn.filereadable(dataform_json_file_path)
+    if dataform_json_file_exists == 0 then
+        error("Not in dataform project root, dataform.json not found in current working directory")
+        return nil
+    end
+    return true
+end
+
 local compile_dataform = function()
 
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
