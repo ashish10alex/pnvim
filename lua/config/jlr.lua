@@ -128,6 +128,7 @@ local check_if_cwd_is_dataform_project_root = function()
 end
 
 local compile_dataform = function()
+    -- TODO: To be deprecated ... (No need to compile the whole project from Neovim. Use cli instead)
 
     local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_wt_tag.sh"
     -- local dataform_compile_cmd_path = os.getenv("HOME") .. "/.config/nvim/lua/config/dataform_compile_all.sh"
@@ -226,7 +227,7 @@ local compile_dataform_wt_tag = function(args)
 
 end
 
-vim.api.nvim_create_user_command("CompileDataform", compile_dataform, {})
+-- vim.api.nvim_create_user_command("CompileDataform", compile_dataform, {})
 vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {})
 vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag, {nargs='*'})
 
