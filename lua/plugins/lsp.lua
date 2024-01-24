@@ -50,7 +50,7 @@ return {
                 "tsserver",
                 "bashls",
                 "gopls",
-                -- "sqlls",
+                "jsonls",
           },
           handlers = {
 
