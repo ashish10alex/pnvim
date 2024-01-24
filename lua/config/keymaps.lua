@@ -10,7 +10,7 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
 -- copies to system clipboard in normal, visual modes
 vim.keymap.set({"n", "v"}, "Y", [["+y]])
--- copies current line to system clipboard in normal & visual modes 
+-- copies current line to system clipboard in normal & visual modes
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 
@@ -30,3 +30,9 @@ vim.keymap.set('n', '<leader>p', ':let @+ = expand("%:t") <CR>')
 
 vim.api.nvim_set_keymap("n", "]q", ":cnext<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "[q", ":cprev<CR>", { noremap = true })
+
+vim.api.nvim_set_keymap("n", "<leader>ed", ":lua vim.diagnostic.open_float(0, {focusable=false})<CR>", { noremap = true })
+
+
+vim.api.nvim_set_keymap("n", "<leader>tv", "<C-w>t<C-w>H", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>th", "<C-w>t<C-w>K", { noremap = true })
