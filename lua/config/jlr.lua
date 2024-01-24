@@ -86,7 +86,7 @@ local compile_sql_on_bigquery_backend = function()
 
     local Job = require'plenary.job'
     Job:new({
-      command = '/Users/ashishalex/Documents/work/jlr/repos/test/go_dry_run/go_dry_run', -- TODO Add go_dry_run to path
+      command = '/Users/ashishalex/bin/go_dry_run', -- TODO Add go_dry_run to path
       args = { '/private/tmp/temp.sqlx' }, -- TODO: why /private ?
       cwd = '/usr/bin',
       env = { ['GCP_PROJECT_ID_DEV'] = GCP_PROJECT_ID_DEV },
@@ -176,7 +176,7 @@ local compile_dataform_file = function()
     end
 
     local filepath_wrt_project_root = vim.fn.expand("%h")
-    print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
+    -- print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
     -- check if file ends with .sqlx
 
@@ -194,11 +194,14 @@ local compile_dataform_file = function()
         select( .fileName == "]].. filepath_wrt_project_root.. [[") |
         "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
-        dataform compile --json | \
-        jq -r '.assertions[] |
-        select( .fileName == "]].. filepath_wrt_project_root.. [[") |
-        "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
     ]]
+
+    -- Remove assertions from compile to make it faster
+    -- dataform compile --json | \
+    -- jq -r '.assertions[] |
+    -- select( .fileName == "]].. filepath_wrt_project_root.. [[") |
+    -- "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
+    -- ]]
 
     local _ = vim.fn.system(dataform_compile_file_cmd)
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
@@ -244,3 +247,5 @@ end
 vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {})
 vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag, {nargs='*'})
 
+--create keymap
+vim.api.nvim_set_keymap('n', '<leader>ef', ':CompileDataformFile<CR>', {noremap = true, silent = true})
