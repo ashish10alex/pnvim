@@ -35,19 +35,27 @@ local parse_dataform_tags = function(args)
         print("No args passed")
     else
         local parsedArgs = args.args
-        local test = load("return " .. parsedArgs)() -- load the string as a lua table
-        include_deps = test.include_deps
+        local parsedArgsTable = load("return " .. parsedArgs)() -- load the string as a lua table
+        include_deps = parsedArgsTable.include_deps
 
         -- print('test.tags: ' .. vim.inspect(test.tags))
         -- print('test.include_deps ' .. vim.inspect(test.include_deps))
 
-        for w in test.tags:gmatch("([^,]+)") do -- split the string by comma
+        for w in parsedArgsTable.tags:gmatch("([^,]+)") do -- split the string by comma
             w = string.gsub(w, "%s+", "") -- trim white space
             tagsString = tagsString .. '--tags=' .. w .. ' '
         end
 
     end
     return tagsString, include_deps
+end
+
+
+local parse_function_args = function(args)
+    local parsedArgsTable = {}
+    local parsedArgs = args.args
+    parsedArgsTable = load("return " .. parsedArgs)() -- load the string as a lua table
+    return parsedArgsTable
 end
 
 local read_stderr_and_get_line_col_numbers = function(stderr_message)
@@ -168,7 +176,14 @@ local compile_dataform = function()
     end
 end
 
-local compile_dataform_file = function()
+local compile_dataform_file = function(args)
+    local include_assertions = false
+    local dataform_compile_file_cmd = nil
+
+    local parse_args_table = parse_function_args(args)
+    if parse_args_table ~= nil then
+        include_assertions = parse_args_table.include_assertions
+    end
 
     local in_dataform_project_root = check_if_cwd_is_dataform_project_root()
     if in_dataform_project_root == nil then
@@ -176,7 +191,7 @@ local compile_dataform_file = function()
     end
 
     local filepath_wrt_project_root = vim.fn.expand("%h")
-    -- print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
+    print('filepath_wrt_project_root: ' .. vim.inspect(filepath_wrt_project_root))
 
     -- check if file ends with .sqlx
 
@@ -186,22 +201,31 @@ local compile_dataform_file = function()
         return
     end
 
-    local dataform_compile_file_cmd = [[
-        echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
+    if include_assertions then
+        dataform_compile_file_cmd = [[
+            echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
-        dataform compile --json | \
-        jq -r '.tables[] |
-        select( .fileName == "]].. filepath_wrt_project_root.. [[") |
-        "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
+            dataform compile --json | \
+            jq -r '.tables[] |
+            select( .fileName == "]].. filepath_wrt_project_root.. [[") |
+            "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
-    ]]
+            dataform compile --json | \
+            jq -r '.assertions[] |
+            select( .fileName == "]].. filepath_wrt_project_root.. [[") |
+            "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
 
-    -- Remove assertions from compile to make it faster
-    -- dataform compile --json | \
-    -- jq -r '.assertions[] |
-    -- select( .fileName == "]].. filepath_wrt_project_root.. [[") |
-    -- "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
-    -- ]]
+        ]]
+    else
+       dataform_compile_file_cmd = [[
+            echo "-- $(date)" > ]] .. SQL_OUT_BUF_PATH .. [[ ;
+
+            dataform compile --json | \
+            jq -r '.tables[] |
+            select( .fileName == "]].. filepath_wrt_project_root.. [[") |
+            "-- } " + .fileName + "\n" + "-- { tags " + (.tags | tojson) + "\n" + .query + "; \n" '  >> ]] .. SQL_OUT_BUF_PATH .. [[ ;
+        ]]
+    end
 
     local _ = vim.fn.system(dataform_compile_file_cmd)
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
@@ -244,8 +268,9 @@ local compile_dataform_wt_tag = function(args)
 end
 
 -- vim.api.nvim_create_user_command("CompileDataform", compile_dataform, {})
-vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {})
+vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {nargs='*'})
 vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag, {nargs='*'})
 
 --create keymap
 vim.api.nvim_set_keymap('n', '<leader>ef', ':CompileDataformFile<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>eaf', ':CompileDataformFile {include_assertions=true}<CR>', {noremap = true, silent = true})
