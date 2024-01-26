@@ -82,6 +82,7 @@ local set_diagnostics_to_buffer = function(bufnr, diagnostics_table, buf_name)
         vim.api.nvim_command("normal gg") -- goto top of the file
     else -- Buffer not open, create a new one
         vim.api.nvim_command("edit " .. buf_name)
+        vim.opt_local.modifiable = false
         vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
     end
 end
