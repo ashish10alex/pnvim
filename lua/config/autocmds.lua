@@ -20,12 +20,13 @@ autocmd('BufEnter', {
 --Enable slate colorscheme when entering .sqlx files
 autocmd('bufenter', {
   pattern = 'temp.sqlx',
-  command = 'colorscheme slate'
+  command = "colorscheme default | lua vim.opt.signcolumn = 'no'"
 })
 
 -- Revert to orignal colorscheme once I leave temp.sqlx file
 autocmd('bufleave', {
   pattern = 'temp.sqlx',
-  command = 'colorscheme catppuccin'
+  --  vim.opt.signcolumn = 'no'
+  command = 'colorscheme catppuccin | lua vim.opt.signcolumn = "yes"'
 })
 
