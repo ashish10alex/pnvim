@@ -54,6 +54,9 @@ end
 local parse_function_args = function(args)
     local parsedArgsTable = {}
     local parsedArgs = args.args
+    if parsedArgs == nil then
+        return nil
+    end
     parsedArgsTable = load("return " .. parsedArgs)() -- load the string as a lua table
     return parsedArgsTable
 end
