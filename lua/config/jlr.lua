@@ -24,7 +24,7 @@ local reset_diagnostics = function(bufnr)
     if bufnr ~= -1 then
         vim.diagnostic.reset(1, bufnr) -- remove all diagnostics from the buffer
     else
-        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the buffer
+        vim.diagnostic.reset(1, 0) -- remove all diagnostics from the current buffer
     end
 end
 
@@ -75,15 +75,23 @@ local read_stderr_and_get_line_col_numbers = function(stderr_message)
     end
 end
 
-local set_diagnostics_to_buffer = function(bufnr, diagnostics_table, buf_name)
-    if bufnr ~= -1 then -- buffer already open
-        vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
-        vim.api.nvim_set_current_buf(bufnr) -- move the cursor to this buffer
-        vim.api.nvim_command("normal gg") -- goto top of the file
-    else -- Buffer not open, create a new one
-        vim.api.nvim_command("edit " .. buf_name)
-        vim.opt_local.modifiable = false
-        vim.diagnostic.set(1, 0, diagnostics_table, {}) -- TODO: get the line number from another cli output
+local set_diagnostics_to_buffer = function(bufnr, diagnostics_table, buf_name, stderr_or_compile_in_place)
+    if bufnr ~= -1 then -- Buffer already open
+        if stderr_or_compile_in_place then
+            vim.diagnostic.set(1, bufnr, diagnostics_table, {})
+            vim.api.nvim_set_current_buf(bufnr) -- Move the cursor to this buffer
+            vim.api.nvim_command("normal gg") -- Go to top of the file
+        else
+            vim.diagnostic.set(1, bufnr, diagnostics_table, {}) -- TODO: get the line number from another cli output
+        end
+    else -- Buffer not open. Create a new one
+        if stderr_or_compile_in_place then
+            vim.api.nvim_command("edit " .. buf_name)
+            vim.opt_local.modifiable = false
+            vim.diagnostic.set(1, 0, diagnostics_table, {})
+        else
+            vim.diagnostic.set(1, 0, diagnostics_table, {})
+        end
     end
 end
 
@@ -129,6 +137,8 @@ end
 -- @param stdout_message: string
 local process_dianostics = function(bufnr, lnum, col, stderr_message, stdout_message)
     local diagnostics_table = {}
+    -- add datetime to stdout_message
+    stdout_message = stdout_message .. "  ( " .. os.date("!%Y-%m-%d %H:%M:%S") .. " )"
     if stderr_message ~= nil then
         diagnostics_table[1] = {bufnr=bufnr, lnum=0, col=0, end_col=1, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
         diagnostics_table[2] = {bufnr=bufnr, lnum=lnum, col=col, end_col=2, severity = vim.diagnostic.severity.ERROR, message = stderr_message,}
@@ -182,11 +192,14 @@ end
 
 local compile_dataform_file = function(args)
     local include_assertions = false
+    local compile_in_place = true
+    local bufnr = -1
     local dataform_compile_file_cmd = nil
 
     local parse_args_table = parse_function_args(args)
     if parse_args_table ~= nil then
         include_assertions = parse_args_table.include_assertions
+        compile_in_place   = parse_args_table.compile_in_place
     end
 
     local in_dataform_project_root = check_if_cwd_is_dataform_project_root()
@@ -238,12 +251,16 @@ local compile_dataform_file = function(args)
     end
 
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
-
-    local bufnr = find_buffer_by_name(SQL_OUT_BUF_PATH)
+    local stderr_or_not_compile_in_place = (stderr_message ~= nil or compile_in_place == false)
+    if stderr_or_not_compile_in_place then
+        bufnr = find_buffer_by_name(SQL_OUT_BUF_PATH)
+    else
+        bufnr = vim.fn.bufnr() -- current buffer
+    end
 
     reset_diagnostics(bufnr)
     local diagnostics_table = process_dianostics(bufnr, lnum, col, stderr_message, stdout_message)
-    set_diagnostics_to_buffer(bufnr, diagnostics_table, SQL_OUT_BUF_PATH)
+    set_diagnostics_to_buffer(bufnr, diagnostics_table, SQL_OUT_BUF_PATH, stderr_or_not_compile_in_place)
 
 end
 
@@ -283,3 +300,20 @@ vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag
 --create keymap
 vim.api.nvim_set_keymap('n', '<leader>ef', ':CompileDataformFile<CR>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<leader>eaf', ':CompileDataformFile {include_assertions=true}<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>enf', ':CompileDataformFile {compile_in_place=false}<CR>', {noremap = true, silent = true})
+
+
+-- TODD: Make this async
+vim.api.nvim_create_autocmd('BufWritePost', {
+  desc = 'CompileDataformFile when a .sqlx file is saved in dataform project root',
+  pattern = '*.sqlx',
+  callback = vim.schedule_wrap( -- TODO: Do we need this. This does not seem to make the function async
+        function()
+            local in_dataform_project_root = check_if_cwd_is_dataform_project_root()
+            if in_dataform_project_root == nil then
+                return
+            end
+            vim.api.nvim_command("CompileDataformFile")
+        end
+    )
+})
