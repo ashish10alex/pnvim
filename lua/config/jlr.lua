@@ -309,10 +309,6 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   pattern = '*.sqlx',
   callback = vim.schedule_wrap( -- TODO: Do we need this. This does not seem to make the function async
         function()
-            local in_dataform_project_root = check_if_cwd_is_dataform_project_root()
-            if in_dataform_project_root == nil then
-                return
-            end
             vim.api.nvim_command("CompileDataformFile")
         end
     )
