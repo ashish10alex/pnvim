@@ -231,7 +231,12 @@ local compile_dataform_file = function(args)
         ]]
     end
 
-    local _ = vim.fn.system(dataform_compile_file_cmd)
+    -- output will be None if there is no stderr (i.e dataform --compile and subsequent jq command is successful)
+    local output = vim.fn.system(dataform_compile_file_cmd)
+    if output ~= "" then
+        error("Error compiling file: " .. output)
+    end
+
     local lnum, col, stderr_message, stdout_message = compile_sql_on_bigquery_backend()
 
     local bufnr = find_buffer_by_name(SQL_OUT_BUF_PATH)
