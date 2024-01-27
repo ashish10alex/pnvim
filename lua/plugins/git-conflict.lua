@@ -1,5 +1,5 @@
 return {
-    'akinsho/git-conflict.nvim', 
+    'akinsho/git-conflict.nvim',
     version = "*",
     config = function()
 
@@ -14,8 +14,8 @@ return {
           },
         })
 
-        vim.keymap.set('n', '<leader>gr', ':GitConflictRefresh<CR>', {noremap = true, silent = true})
-        vim.keymap.set('n', '<leader>gq', ':GitConflictQf<CR>', {noremap = true, silent = true})
+        -- vim.keymap.set('n', '<leader>gc', ':GitConflictRefresh<CR>', {noremap = true, silent = true})
+        -- vim.keymap.set('n', '<leader>gq', ':GitConflictQf<CR>', {noremap = true, silent = true})
 
         vim.api.nvim_create_autocmd('User', {
           pattern = 'GitConflictDetected',
