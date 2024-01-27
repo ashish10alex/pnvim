@@ -8,6 +8,7 @@ return {
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/nvim-cmp",
     },
 
     config = function()
@@ -69,7 +70,7 @@ return {
                         settings = {
                           Lua = {
                             diagnostics = {
-                              globals = { 'vim', 'feedkey', 'has_words_before' }
+                              globals = { 'vim', 'feedkey', 'has_words_before', 'P'}
                             },
                             workspace = {
                               library = {
