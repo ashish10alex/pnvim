@@ -68,11 +68,30 @@ end
 
 
 -- Delete to blackhole register if line is empty
-function Smart_dd()
-	if vim.api.nvim_get_current_line():match("^%s*$") then
-		return '"_dd'
-	else
-		return "dd"
+-- function Smart_dd()
+-- 	if vim.api.nvim_get_current_line():match("^%s*$") then
+-- 		return '"_dd'
+-- 	else
+-- 		return "dd"
+-- 	end
+-- end
+-- vim.api.nvim_set_keymap('n', 'dd', 'v:lua.Smart_dd()', {expr = true, noremap = true})
+
+
+-- Toogle quickfix list
+function QuickFixToggle()
+	local qf_exists = false
+	for _, win in pairs(vim.fn.getwininfo()) do
+		if win["quickfix"] == 1 then
+			qf_exists = true
+		end
+	end
+	if qf_exists == true then
+		vim.cmd("cclose")
+		return
+	end
+	if not vim.tbl_isempty(vim.fn.getqflist()) then
+		vim.cmd("copen")
 	end
 end
-vim.api.nvim_set_keymap('n', 'dd', 'v:lua.Smart_dd()', {expr = true, noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>q', ':lua QuickFixToggle()<CR>', {noremap = true})

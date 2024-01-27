@@ -3,6 +3,7 @@
 vim.api.nvim_set_keymap("n", "<leader>[", ":bp!<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>]", ":bn!<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>x", ":bd<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<leader>q", ":q<CR>", { noremap = true })
 
 vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
