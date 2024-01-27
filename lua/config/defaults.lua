@@ -60,7 +60,19 @@ vim.cmd([[
     nnoremap <silent> [e <cmd>lua vim.diagnostic.goto_prev({popup_opts = {focusable=false}})<CR>
 ]])
 
+-- Easy printing of lua tables
 P = function(v)
   print(vim.inspect(v))
   return v
 end
+
+
+-- Delete to blackhole register if line is empty
+function Smart_dd()
+	if vim.api.nvim_get_current_line():match("^%s*$") then
+		return '"_dd'
+	else
+		return "dd"
+	end
+end
+vim.api.nvim_set_keymap('n', 'dd', 'v:lua.Smart_dd()', {expr = true, noremap = true})
