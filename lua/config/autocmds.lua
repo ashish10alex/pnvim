@@ -36,3 +36,17 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   pattern = '*',
   command = 'silent! normal! g`"zv'
 })
+
+-- when entering a file that ends with .sqlfluff set filetype to bash
+vim.api.nvim_create_autocmd('BufReadPost', {
+  desc = 'set filetype to bash when entering a file that ends with .sqlfluff',
+  pattern = '*.sqlfluff',
+  command = 'set filetype=bash'
+})
+
+vim.api.nvim_create_autocmd('BufReadPost', {
+  desc = 'Set filetype to terraform when entering a file that ends with .tfvars',
+  pattern = '*.tfvars',
+  command = 'set filetype=terraform'
+})
+
