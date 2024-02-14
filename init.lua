@@ -18,5 +18,18 @@ require("config.jlr")
 
 require("lazy").setup({
 	{import = 'plugins'},
+    {
+        "ashish10alex/dataform.nvim",
+        dir = '/Users/ashishalex/Documents/personal/repos/plugins/dataform.nvim',
+        config = function()
+            local opts = {
+                timeout = 10000,
+                gcp_project_id_dev = "jlr-it-scanalytics-dev",
+                sql_out_buf_path = "/tmp/output.sql",
+                go_dry_run_cli_path = "$HOME/bin/go_dry_run",
+            }
+            require('dataform').setup(opts)
+        end
+    },
 })
 
