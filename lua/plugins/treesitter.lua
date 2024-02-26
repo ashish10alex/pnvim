@@ -6,14 +6,14 @@ return {
 			pcall(require("nvim-treesitter.install").update({ with_sync = true }))
 		end,
 		dependencies = {
-            'nvim-treesitter/nvim-treesitter-context',
+            -- 'nvim-treesitter/nvim-treesitter-context', -- The UI seems laggy when using this
 			"nvim-treesitter/nvim-treesitter-textobjects",
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup({
 				-- Add languages to be installed here that you want installed for treesitter
 				ensure_installed = {
-                    "lua", "python", "vimdoc", "vim", "html", "tsx", "javascript", "typescript", "json", "yaml",  "go", "sql", "mermaid"
+                    "lua", "python", "vimdoc", "vim", "html", "tsx", "javascript", "typescript", "json", "yaml",  "go", "sql", "mermaid", "http",
                 },
 
 				highlight = { enable = true },

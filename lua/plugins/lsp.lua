@@ -52,6 +52,8 @@ return {
                 "bashls",
                 "gopls",
                 "jsonls",
+                -- "terraformls",
+                -- "tflint",
           },
           handlers = {
 
@@ -82,7 +84,19 @@ return {
                         }
                    }
                end,
-
+                -- ["terraformls"] = function()
+                --     local lspconfig = require("lspconfig")
+                --     lspconfig.terraformls.setup{
+                --         capabilities = capabilities,
+                --         on_attach = on_attach,
+                --     }
+                --     vim.api.nvim_create_autocmd({"BufWritePre"}, {
+                --       pattern = {"*.tf", "*.tfvars"},
+                --       callback = function()
+                --         vim.lsp.buf.format()
+                --       end,
+                --     })
+                -- end,
               -- ["sqlls"] = function()
               --       local lspconfig = require("lspconfig")
               --       lspconfig.sqlls.setup {

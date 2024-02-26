@@ -6,7 +6,6 @@ return {
         'airblade/vim-gitgutter',
     },
     config = function()
-        vim.keymap.set('n', '<leader>gs', ':Git<CR>', {silent = true})
         vim.keymap.set('n', '<leader>gc', ':Git commit<CR>', {silent = true})
         vim.keymap.set('n', '<leader>gp', ':Git push<CR>', {silent = true})
         -- vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', {silent = true})

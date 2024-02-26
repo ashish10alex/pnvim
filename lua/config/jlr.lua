@@ -298,19 +298,10 @@ vim.api.nvim_create_user_command("CompileDataformFile", compile_dataform_file, {
 vim.api.nvim_create_user_command("CompileDataformWtTag", compile_dataform_wt_tag, {nargs='*'})
 
 --create keymap
-vim.api.nvim_set_keymap('n', '<leader>ec', ':lua require("dataform").compile_dataform_and_run_go_cli({in_place=false})<CR>', {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', '<leader>ec', ':lua require("dataform").compile_dataform_and_run_go_cli({in_place=false})<CR>', {noremap = true, silent = true})
 -- vim.api.nvim_set_keymap('n', '<leader>ef', ':CompileDataformFile<CR>', {noremap = true, silent = true})
--- vim.api.nvim_set_keymap('n', '<leader>eaf', ':CompileDataformFile {include_assertions=true}<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>eaf', ':CompileDataformFile {include_assertions=true}<CR>', {noremap = true, silent = true})
 -- vim.api.nvim_set_keymap('n', '<leader>enf', ':CompileDataformFile {compile_in_place=false}<CR>', {noremap = true, silent = true})
 
 
 -- TODD: Make this async
-vim.api.nvim_create_autocmd('BufWritePost', {
-  desc = 'CompileDataformFile when a .sqlx file is saved in dataform project root',
-  pattern = '*.sqlx',
-  callback = vim.schedule_wrap( -- TODO: Do we need this. This does not seem to make the function async
-        function()
-            vim.cmd('lua require("dataform").compile_dataform_and_run_go_cli({in_place=true})')
-        end
-    )
-})
