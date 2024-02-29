@@ -2,9 +2,6 @@
 local augroup = vim.api.nvim_create_augroup   -- Create/get autocommand group
 local autocmd = vim.api.nvim_create_autocmd   -- Create autocommand
 
--- Highlight on yank
-augroup('YankHighlight', { clear = true })
-
 -- Remove whitespace on save
 autocmd('BufWritePre', {
   pattern = '',
@@ -50,3 +47,11 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   command = 'set filetype=terraform'
 })
 
+-- Highlight when yanking (copying) text
+-- vim.api.nvim_create_autocmd('TextYankPost', {
+--   desc = 'Highlight when yanking (copying) text',
+--   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+--   callback = function()
+--     vim.highlight.on_yank()
+--   end,
+-- })

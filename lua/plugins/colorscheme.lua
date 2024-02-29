@@ -1,5 +1,5 @@
-return
--- {
+-- return {}
+-- return {
 --     "catppuccin/nvim",
 --     name = "catppuccin",
 --     priority = 1000,
@@ -8,7 +8,7 @@ return
 --         vim.cmd.colorscheme "catppuccin"
 --     end
 -- },
-{     -- You can easily change to a different colorscheme.
+return {     -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is
     --
