@@ -1,16 +1,14 @@
 return {
     {
-        "catppuccin/nvim", name = "catppuccin", priority = 1000 ,
+        'numToStr/Comment.nvim',
+        opts = {
+        },
         lazy = false,
-        config = function()
-            vim.cmd.colorscheme "catppuccin"
-        end
     },
-    { 'tpope/vim-commentary'},
-    -- { 'dstein64/vim-startuptime'},
-    { 'inkarkat/vim-ReplaceWithRegister'},
-    {  'andres-lowrie/vim-sqlx' },
-    { 'yuttie/comfortable-motion.vim',
+    { 'inkarkat/vim-ReplaceWithRegister' },
+    { 'andres-lowrie/vim-sqlx' },
+    {
+        'yuttie/comfortable-motion.vim',
         config = function()
             vim.g.comfortable_motion_friction = 80.0
             vim.g.comfortable_motion_air_drag = 12.0
