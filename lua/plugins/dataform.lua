@@ -12,11 +12,14 @@ return {
         }
         require('dataform').setup(opts)
 
-        vim.api.nvim_set_keymap("n", "<leader>dc", ":lua require('dataform').trigger_dataform_diagnostics({in_place=true, get_compiled_query=true})<CR>", { noremap = true })
+        vim.api.nvim_set_keymap("n", "<leader>dc",
+            ":lua require('dataform').trigger_dataform_diagnostics({in_place=true, get_compiled_query=true})<CR>",
+            { noremap = true })
 
         vim.api.nvim_create_autocmd('BufModifiedSet', {
-        -- vim.api.nvim_create_autocmd('BufWritePost', {
+            -- vim.api.nvim_create_autocmd('BufWritePost', {
             desc = 'Compile dataform and run go cli when a sqlx file is modified',
+            group = vim.api.nvim_create_augroup('dataform-nvim-group', { clear = true }),
             pattern = '*.sqlx',
             callback =
                 function()
