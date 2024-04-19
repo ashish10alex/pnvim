@@ -6,7 +6,7 @@ return {
         },
 
         config = function()
-        vim.keymap.set("n", "<leader>nt", vim.cmd.NvimTreeOpen)
+        vim.keymap.set("n", "<leader>nt", vim.cmd.NvimTreeToggle)
         require("nvim-tree").setup({
           sort = {
             sorter = "case_sensitive",
