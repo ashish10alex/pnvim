@@ -1,5 +1,6 @@
 return {
-	"nvim-telescope/telescope.nvim", tag = "0.1.5",
+	"nvim-telescope/telescope.nvim",
+     branch = 'master',
 	dependencies = {
 		'nvim-lua/plenary.nvim' ,
 		{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
@@ -13,6 +14,11 @@ return {
             prompt_prefix = "> ",
             file_ignore_patterns = {".git/", ".cache", "%.o", "%.a", "%.out", "%.class",
                 "%rpdf", "%.mkv", "%.mp4", "%.zip", "node_modules", "yarn.lock"},
+            path_display = {
+              filename_first = {
+              reverse_directories = false
+             }
+            },
           },
           pickers = {
             find_files = {
