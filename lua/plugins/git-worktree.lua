@@ -1,7 +1,7 @@
 return {
      'ThePrimeagen/git-worktree.nvim',
      dependencies = {
-        'nvim-telescope/telescope.nvim', tag = '0.1.5',
+        'nvim-telescope/telescope.nvim', branch = 'master',
     },
     config = function()
         pcall(require("telescope").load_extension("git_worktree"))
