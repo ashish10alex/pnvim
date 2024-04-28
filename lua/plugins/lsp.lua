@@ -39,6 +39,42 @@ return {
             )
         end
 
+        local cmp = require("cmp")
+
+        cmp.setup({
+            window = {
+                completion = cmp.config.window.bordered(),
+                documentation = cmp.config.window.bordered(),
+            }
+        })
+
+
+        -- Specify how the border looks like
+        local border = {
+            { '┌', 'FloatBorder' },
+            { '─', 'FloatBorder' },
+            { '┐', 'FloatBorder' },
+            { '│', 'FloatBorder' },
+            { '┘', 'FloatBorder' },
+            { '─', 'FloatBorder' },
+            { '└', 'FloatBorder' },
+            { '│', 'FloatBorder' },
+        }
+
+        -- Add the border on hover and on signature help popup window
+        local handlers = {
+            ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
+            ['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+        }
+
+        -- Add border to the diagnostic popup window
+        vim.diagnostic.config({
+            virtual_text = {
+                prefix = '■ ', -- Could be '●', '▎', 'x', '■', , 
+            },
+            float = { border = border },
+        })
+
         require("mason").setup()
 
         require("mason-lspconfig").setup({
@@ -54,42 +90,43 @@ return {
                 -- "tflint",
             },
             handlers = {
-
                 function(server_name)
                     require("lspconfig")[server_name].setup({
                         on_attach = on_attach,
+                        handlers = handlers,
                         capabilities = capabilities,
                     })
                 end,
 
                 ["lua_ls"] = function()
-                     local lspconfig = require("lspconfig")
-                     lspconfig.lua_ls.setup {
-                         capabilities = capabilities,
-                         on_attach = on_attach,
-                         settings = {
-                             Lua = {
-                                 runtime = { version = 'LuaJIT' },
-                                 workspace = {
-                                     checkThirdParty = false,
-                                     -- Tells lua_ls where to find all the Lua files that you have loaded
-                                     -- for your neovim configuration.
-                                     library = {
-                                         '${3rd}/luv/library',
-                                         unpack(vim.api.nvim_get_runtime_file('', true)),
-                                     },
-                                     -- If lua_ls is really slow on your computer, you can try this instead:
-                                     -- library = { vim.env.VIMRUNTIME },
-                                 },
-                                 completion = {
-                                     callSnippet = 'Replace',
-                                 },
-                                 -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                                 -- diagnostics = { disable = { 'missing-fields' } },
-                             },
-                         },
+                    local lspconfig = require("lspconfig")
+                    lspconfig.lua_ls.setup {
+                        handlers = handlers,
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                        settings = {
+                            Lua = {
+                                runtime = { version = 'LuaJIT' },
+                                workspace = {
+                                    checkThirdParty = false,
+                                    -- Tells lua_ls where to find all the Lua files that you have loaded
+                                    -- for your neovim configuration.
+                                    library = {
+                                        '${3rd}/luv/library',
+                                        unpack(vim.api.nvim_get_runtime_file('', true)),
+                                    },
+                                    -- If lua_ls is really slow on your computer, you can try this instead:
+                                    -- library = { vim.env.VIMRUNTIME },
+                                },
+                                completion = {
+                                    callSnippet = 'Replace',
+                                },
+                                -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+                                -- diagnostics = { disable = { 'missing-fields' } },
+                            },
+                        },
 
-                     }
+                    }
                 end,
                 -- ["terraformls"] = function()
                 --     local lspconfig = require("lspconfig")
