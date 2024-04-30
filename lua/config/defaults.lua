@@ -45,6 +45,7 @@ vim.o.ignorecase = true                   -- Enable case-insensitive search
 vim.o.foldmethod = "indent"               -- Set folding method to indent
 vim.o.foldlevel = 99                      -- Set initial fold level to 99 (closed)
 vim.o.clipboard = "unnamedplus"           -- Use system clipboard
+vim.o.wrap = false                        -- Disable line wrapping
 vim.cmd("highlight Comment cterm=italic") -- Highlight comments in italics
 
 
