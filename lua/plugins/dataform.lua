@@ -11,5 +11,10 @@ return {
             error_message_path = "/tmp/error_message.txt",
         }
         require('dataform').setup(opts)
+
+        vim.api.nvim_set_keymap("n", "<leader>dc",
+            ":lua require('dataform').trigger_dataform_diagnostics({in_place=true, get_compiled_query=true})<CR>",
+            { noremap = true }
+        )
     end
 }
