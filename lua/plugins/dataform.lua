@@ -1,5 +1,9 @@
 return {
     "ashish10alex/dataform.nvim",
+    dependencies = {
+        "hrsh7th/nvim-cmp",
+        "onsails/lspkind.nvim"
+    },
     dir = '/Users/ashishalex/Documents/personal/repos/plugins/dataform.nvim',
     config = function()
         local opts = {
@@ -9,7 +13,7 @@ return {
             dj_cli_path        = "$HOME/bin/dj",
             compiled_json_path = "/tmp/compiled.json",
             error_message_path = "/tmp/error_message.txt",
-            create_autocmds = true,
+            create_autocmds    = true,
         }
         require('dataform').setup(opts)
 
@@ -19,3 +23,13 @@ return {
         )
     end
 }
+
+--[[
+return {
+  'magal1337/dataform.nvim',
+  dir = '/Users/ashishalex/Documents/personal/repos/dataform.nvim',
+  dependencies = {
+    'rcarriga/nvim-notify',
+  },
+}
+--]]

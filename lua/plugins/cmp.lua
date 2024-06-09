@@ -11,6 +11,9 @@ local M = {
 	},
 }
 
+
+-- Don't forget to register your new source to cmp.
+
 M.config = function()
 	local cmp = require("cmp")
 	vim.opt.completeopt = { "menu", "menuone", "noselect" }
@@ -35,7 +38,7 @@ M.config = function()
                 function(fallback)
                     if cmp.visible()
                         then cmp.select_next_item()
-                    elseif vim.fn["vsnip#available"](1) == 1 
+                    elseif vim.fn["vsnip#available"](1) == 1
                         then feedkey("<Plug>(vsnip-expand-or-jump)", "")
                     elseif has_words_before()
                         then cmp.complete()
@@ -55,10 +58,27 @@ M.config = function()
 		sources = cmp.config.sources({
 			{ name = "nvim_lsp" },
 			{ name = "luasnip" }, -- For luasnip users.
+            {
+                name = "dataform",
+                -- `group_index` groups several sources,
+                -- and if any completion item for that index is found
+                -- all sources with a lower index will be ignored.
+                group_index = 1,
+            },
+
 		}, {
-			{ name = "buffer" },
+			{ name = "buffer", keyword_length = 5 },
 			{ name = "path" },
 		}),
+
+        formatting = {
+            format = require("lspkind").cmp_format({
+                mode = "symbol_text",
+                menu = {
+                    dataform = "[DATAFORM]",
+                },
+            }),
+        },
 	})
 	-- cmp.setup.cmdline(":", { -- DONOT LIKE THIS AS OF NOW
 	-- 	mapping = cmp.mapping.preset.cmdline(),
@@ -69,6 +89,8 @@ M.config = function()
 	-- 	}),
 	-- })
 end
+
+
 
 return M
 
