@@ -10,7 +10,7 @@ return {
             timeout            = 10000,
             gcp_project_id     = vim.env.GCP_PROJECT_ID_DEV,
             sql_out_buf_path   = "/tmp/output.sql",
-            dj_cli_path        = "$HOME/bin/dj",
+            dj_cli_path        = "$HOME/go/bin/dj",
             compiled_json_path = "/tmp/compiled.json",
             error_message_path = "/tmp/error_message.txt",
             create_autocmds    = true,
