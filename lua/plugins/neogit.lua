@@ -1,6 +1,6 @@
 return {
     "NeogitOrg/neogit",
-    branch="nightly",
+    branch="master",
     dependencies = {
         "nvim-lua/plenary.nvim",  -- required
         "sindrets/diffview.nvim", -- optional - Diff integration
@@ -10,7 +10,9 @@ return {
     },
     config = function()
         local neogit = require('neogit')
-        neogit.setup({})
+        neogit.setup({
+            filewatcher = { enabled = false }
+        })
 
         vim.keymap.set('n', '<leader>gs', ':Neogit<CR>', { silent = true })
 
