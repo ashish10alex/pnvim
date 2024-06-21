@@ -21,6 +21,11 @@ return {
             ":lua require('dataform').trigger_dataform_diagnostics({in_place=true, get_compiled_query=true})<CR>",
             { noremap = true }
         )
+
+        vim.api.nvim_set_keymap("n", "<leader>k",
+            ":lua require('dataform').format_sqlx_file({})<CR>",
+            { noremap = true }
+        )
     end
 }
 
