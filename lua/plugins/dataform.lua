@@ -14,18 +14,28 @@ return {
             compiled_json_path = "/tmp/compiled.json",
             error_message_path = "/tmp/error_message.txt",
             create_autocmds    = true,
+            formatting         = {
+                enabled = true,
+                sqlfluff_config_path = "ci/sqlfluff_dataform/.sqlfluff",
+            }
         }
         require('dataform').setup(opts)
+
+        vim.api.nvim_set_keymap("n", "gd",
+            ":lua require('dataform').go_to_definition({})<CR>",
+            { noremap = true }
+        )
+
+        vim.api.nvim_set_keymap("n", "<leader>k",
+            ":lua require('dataform').format_current_sqlx_file({})<CR>",
+            { noremap = true }
+        )
 
         vim.api.nvim_set_keymap("n", "<leader>dc",
             ":lua require('dataform').trigger_dataform_diagnostics({in_place=true, get_compiled_query=true})<CR>",
             { noremap = true }
         )
 
-        vim.api.nvim_set_keymap("n", "<leader>k",
-            ":lua require('dataform').format_sqlx_file({})<CR>",
-            { noremap = true }
-        )
     end
 }
 
