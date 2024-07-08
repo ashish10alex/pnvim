@@ -29,7 +29,7 @@ vim.o.backup = false                      -- Disable backup files
 vim.o.writebackup = false                 -- Disable writebackup files
 vim.o.syntax = "on"                       -- Enable syntax highlighting
 vim.o.relativenumber = true               -- Enable relative line numbers
-vim.o.textwidth = 120                     -- Set text width to 120 characters
+vim.o.textwidth = 220                     -- Set text width to 120 characters
 vim.o.updatetime = 30                     -- Set update time to 30 milliseconds
 vim.o.termguicolors = true                -- Enable true color support
 vim.o.tabstop = 4                         -- Set tab stop to 4 spaces
@@ -42,12 +42,19 @@ vim.o.smartcase = true                    -- Enable smart case search
 vim.o.incsearch = true                    -- Enable incremental search
 vim.o.hlsearch = true                     -- Enable highlight search
 vim.o.ignorecase = true                   -- Enable case-insensitive search
-vim.o.foldmethod = "indent"               -- Set folding method to indent
-vim.o.foldlevel = 99                      -- Set initial fold level to 99 (closed)
+-- vim.o.foldmethod = "indent"               -- Set folding method to indent
+-- vim.o.foldlevel = 99                      -- Set initial fold level to 99 (closed)
+vim.opt.foldtext = ""
 vim.o.clipboard = "unnamedplus"           -- Use system clipboard
 vim.o.wrap = false                        -- Disable line wrapping
 vim.cmd("highlight Comment cterm=italic") -- Highlight comments in italics
 
+vim.cmd([[
+    au BufWinEnter *.sqlx set updatetime=200 | set autoread
+    au CursorHold *.sqlx  checktime
+]])
+
+-- vim.o.foldenable = false
 
 -- ** Hack to make diagnostics work for CompileDataform **
 -- Show line diagnostics automatically in hover window
@@ -60,6 +67,7 @@ vim.cmd([[
     nnoremap <silent> ]e <cmd>lua vim.diagnostic.goto_next({popup_opts = {focusable=false}})<CR>
     nnoremap <silent> [e <cmd>lua vim.diagnostic.goto_prev({popup_opts = {focusable=false}})<CR>
 ]])
+
 
 -- Easy printing of lua tables
 P = function(v)
@@ -96,3 +104,4 @@ function QuickFixToggle()
 	end
 end
 vim.api.nvim_set_keymap('n', '<leader>q', ':lua QuickFixToggle()<CR>', {noremap = true})
+

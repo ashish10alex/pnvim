@@ -1,10 +1,4 @@
 return {
-    {
-        'numToStr/Comment.nvim',
-        opts = {
-        },
-        lazy = false,
-    },
     { 'inkarkat/vim-ReplaceWithRegister' },
     { 'andres-lowrie/vim-sqlx' },
     {
@@ -25,6 +19,6 @@ return {
     },
     -- Highlight todo, notes, etc in comments
     { 'folke/todo-comments.nvim', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-    { 'Pocco81/true-zen.nvim' },
+    -- { 'Pocco81/true-zen.nvim' },
 
 }

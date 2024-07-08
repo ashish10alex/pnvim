@@ -23,7 +23,7 @@ return {
           pickers = {
             find_files = {
               hidden = true,
-              git_ignore = false,
+              git_ignore = true,
             },
             live_grep = {
               additional_args = function(opts)
