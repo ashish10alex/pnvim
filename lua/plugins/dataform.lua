@@ -39,12 +39,3 @@ return {
     end
 }
 
---[[
-return {
-  'magal1337/dataform.nvim',
-  dir = '/Users/ashishalex/Documents/personal/repos/dataform.nvim',
-  dependencies = {
-    'rcarriga/nvim-notify',
-  },
-}
---]]
