@@ -21,7 +21,14 @@ return {
                 group_empty = true,
             },
             filters = {
-                dotfiles = true,
+                enable = true,
+                git_ignored = true,
+                dotfiles = false,
+                git_clean = false,
+                no_buffer = false,
+                no_bookmark = false,
+                custom = {},
+                exclude = {},
             },
             actions = {
                 open_file = {

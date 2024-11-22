@@ -58,27 +58,10 @@ M.config = function()
 		sources = cmp.config.sources({
 			{ name = "nvim_lsp" },
 			{ name = "luasnip" }, -- For luasnip users.
-            {
-                name = "dataform",
-                -- `group_index` groups several sources,
-                -- and if any completion item for that index is found
-                -- all sources with a lower index will be ignored.
-                group_index = 1,
-            },
-
 		}, {
 			{ name = "buffer", keyword_length = 5 },
 			{ name = "path" },
 		}),
-
-        formatting = {
-            format = require("lspkind").cmp_format({
-                mode = "symbol_text",
-                menu = {
-                    dataform = "[DATAFORM]",
-                },
-            }),
-        },
 	})
 	-- cmp.setup.cmdline(":", { -- DONOT LIKE THIS AS OF NOW
 	-- 	mapping = cmp.mapping.preset.cmdline(),

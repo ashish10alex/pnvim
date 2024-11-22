@@ -13,7 +13,7 @@ return {
 			require("nvim-treesitter.configs").setup({
 				-- Add languages to be installed here that you want installed for treesitter
 				ensure_installed = {
-                    "lua", "python", "vimdoc", "vim", "html", "tsx", "javascript", "typescript", "json", "yaml",  "go", "sql", "mermaid", "http", "markdown", "markdown_inline", "luadoc", "query", "c", "hcl", "terraform", "gitignore", "bash", "requirements", "toml"
+                    "lua", "python", "vimdoc", "vim", "html", "tsx", "javascript", "typescript", "json", "yaml",  "go", "sql", "mermaid", "http", "markdown", "markdown_inline", "luadoc", "query", "c", "hcl", "terraform", "gitignore", "bash", "requirements", "toml", "just", "ini",
                 },
 
 				highlight = { enable = true },

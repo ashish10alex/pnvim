@@ -86,6 +86,7 @@ return {
                 "bashls",
                 "gopls",
                 "jsonls",
+                "yamlls",
                 -- "terraformls",
                 -- "tflint",
             },
@@ -96,6 +97,21 @@ return {
                         handlers = handlers,
                         capabilities = capabilities,
                     })
+                end,
+
+                ["yamlls"] = function()
+                    local lspconfig = require("lspconfig")
+                    lspconfig.yamlls.setup {
+                        settings = {
+                            yaml = {
+                                keyOrdering = false,
+                                schemas = {
+                                    ["https://raw.githubusercontent.com/docker/compose/master/compose/config/compose_spec.json"] = "docker-compose*.{yml,yaml}",
+                                    ["https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.yaml"] = ".gitlab-ci.yml.{yml,yaml}"
+                                },
+                            },
+                        },
+                    }
                 end,
 
                 ["lua_ls"] = function()
