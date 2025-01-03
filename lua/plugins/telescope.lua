@@ -6,6 +6,7 @@ return {
 		{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
         "LinArcX/telescope-env.nvim",
         "zane-/cder.nvim",
+        "nvim-telescope/telescope-frecency.nvim",
 	},
 	config = function()
         local grep_args = { '--hidden' }
@@ -65,13 +66,15 @@ return {
 
         require('telescope').load_extension('fzf')
         require('telescope').load_extension('env')
+        require('telescope').load_extension('frecency')
+        vim.keymap.set('n', '<leader>f', ':Telescope frecency workspace=CWD path_display={"filename_first"} theme=ivy<CR>', {})
 
         require('telescope').load_extension('cder')
         vim.keymap.set('n', '<leader>cd', ':Telescope cder<CR>', {})
 
 		local builtin = require("telescope.builtin")
 
-		vim.keymap.set('n', '<leader>f', builtin.find_files, {})
+		-- vim.keymap.set('n', '<leader>f', builtin.find_files, {})
         vim.keymap.set('n', '<leader>b', builtin.buffers, {})
 
         vim.keymap.set('n', '<leader>grep', builtin.live_grep, {})
