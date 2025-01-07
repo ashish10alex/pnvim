@@ -63,8 +63,6 @@ return {
                     dir_command = { 'fd', '--type=d', '.', vim.loop.cwd(), '--hidden', '--exclude', '.git' },
                 },
                 frecency = {
-                    auto_validate = false,
-                    matcher = "fuzzy",
                     path_display = { "filename_first" },
                     show_filter_column = false
                 },
