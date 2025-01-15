@@ -25,6 +25,11 @@ return { 'laytan/cloak.nvim',
                   -- If left emtpy the legacy behavior of keeping the first character is retained.
                   replace = nil,
                 },
+                {
+                    file_pattern = '*.tf',
+                    cloak_pattern = 'personal_access_token_secret%s*=%s*".-"',
+                    replace = 'personal_access_token_secret',
+                },
               },
             })
         end
