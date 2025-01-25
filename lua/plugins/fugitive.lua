@@ -10,7 +10,7 @@ return {
         vim.keymap.set('n', '<leader>gc', ':Git commit<CR>', {silent = true})
         vim.keymap.set('n', '<leader>gp', ':Git push<CR>', {silent = true})
         -- vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', {silent = true})
-        vim.keymap.set('n', '<leader>gl', ':Git log<CR>', {silent = true})
+        -- vim.keymap.set('n', '<leader>gl', ':Git log<CR>', {silent = true})
 
         vim.keymap.set('n', ']g', ':Gitsigns next_hunk<CR>', {noremap = true, silent = true})
         vim.keymap.set('n', '[g', ':Gitsigns prev_hunk<CR>', {noremap = true, silent = true})

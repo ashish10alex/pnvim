@@ -14,7 +14,7 @@ return {
         require('telescope').setup {
             defaults = {
                 prompt_prefix = "> ",
-                file_ignore_patterns = { ".git/", ".cache", "%.o", "%.a", "%.out", "%.class",
+                file_ignore_patterns = { "^.git/", ".cache", "%.o", "%.a", "%.out", "%.class",
                     "%rpdf", "%.mkv", "%.mp4", "%.zip", "node_modules", "yarn.lock" },
                 path_display = {
                     filename_first = {
