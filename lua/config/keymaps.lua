@@ -37,3 +37,4 @@ vim.api.nvim_set_keymap("n", "<leader>ed", ":lua vim.diagnostic.open_float(0, {f
 
 vim.api.nvim_set_keymap("n", "<leader>tv", "<C-w>t<C-w>H", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>th", "<C-w>t<C-w>K", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>zm", ":ZenMode<CR>", { noremap = true })

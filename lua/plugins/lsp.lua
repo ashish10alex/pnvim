@@ -87,6 +87,7 @@ return {
                 "gopls",
                 "jsonls",
                 "yamlls",
+                "tinymist",
                 -- "terraformls",
                 -- "tflint",
             },
@@ -98,6 +99,18 @@ return {
                         capabilities = capabilities,
                     })
                 end,
+
+                ["tinymist"] = function()
+                    local lspconfig = require("lspconfig")
+                    lspconfig.tinymist.setup {
+                        settings = {
+                            formatterMode = "typstyle",
+                            exportPdf = "onType",
+                            semanticTokens = "disable"
+                        },
+                    }
+                end,
+
 
                 ["yamlls"] = function()
                     local lspconfig = require("lspconfig")

@@ -64,7 +64,8 @@ return {
                 },
                 frecency = {
                     path_display = { "filename_first" },
-                    show_filter_column = false
+                    show_filter_column = false,
+                    db_safe_mode = false,
                 },
             },
         }
@@ -110,6 +111,7 @@ return {
         vim.keymap.set('n', '<leader>gd', builtin.lsp_definitions, {})
         vim.keymap.set('n', '<leader>de', builtin.diagnostics, {})
         vim.keymap.set('n', '<leader>gv', builtin.lsp_references, {})
+        vim.keymap.set('n', '<leader>gi', builtin.lsp_implementations, {})
         vim.keymap.set('n', '<leader>ds', builtin.lsp_document_symbols, {})
         vim.keymap.set('n', '<leader>ws', builtin.lsp_dynamic_workspace_symbols, {})
     end,
